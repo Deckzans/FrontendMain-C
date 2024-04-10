@@ -1,0 +1,100 @@
+.organigrama-container {
+    margin: 20px;
+    align-items: center; /* Ajusta según sea necesario */
+  }
+  
+  .area-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Ajusta el tamaño de las columnas */
+    gap: 20px; /* Espacio entre las áreas */
+  }
+  
+  .area-container {
+    padding: 20px;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+
+  select {
+    /* Estilos generales para el elemento select */
+    width: 200px;
+    padding: 8px;
+    border: 1px solid #3498db;
+    color: #3498db;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+  }
+  
+  option {
+    /* Estilos para las opciones */
+    background-color: #ecf0f1;
+    color: #3498db;
+    padding: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  option:hover {
+    /* Estilos para cuando el mouse pasa sobre las opciones */
+    background-color: #3498db;
+    color: #fff;
+  }
+
+  /* Estilos generales para el contenedor del carrusel */
+/* Estilos generales para el contenedor del carrusel */
+.carrusel-container {
+  overflow-x: auto; /* Permite el desplazamiento horizontal */
+  white-space: nowrap; /* Evita el salto de línea para que los elementos permanezcan en la misma línea */
+  display: flex;
+  margin-bottom: 20px; 
+  align-items: center;/* Alinear los elementos en línea */
+}
+
+/* Estilos para cada tarjeta del empleado */
+.empleado-card {
+  /* Ajusta el tamaño y margen de las tarjetas según tus necesidades */
+  margin-right: 10px;
+  align-items: center;
+  width: auto; /* O ajusta a un valor específico según tus necesidades */
+  overflow: auto;
+  white-space: normal; 
+}
+
+/* Estilos adicionales, por ejemplo, para ocultar las barras de desplazamiento */
+body {
+  overflow-x: hidden;
+}
+
+/* O si quieres mostrar las barras de desplazamiento solo cuando sea necesario */
+.carrusel-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.carrusel-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+}
+
+.carrusel-container::-webkit-scrollbar-track {
+  background-color: #eee;
+}
+
+/* Contenedor adicional para alinear las tarjetas en línea */
+.empleado-card-container {
+  display: flex;
+  overflow: auto; 
+}
+
+
+
+.area-title {
+  margin-bottom: 20px; 
+  text-align: center;/* Ajusta según sea necesario */
+}
+
+.jerarquia-container {
+  display: flex;
+  flex-direction: column;/* Alinea horizontalmente */
+  align-items: center;/* Alinea verticalmente */
+}

@@ -1,0 +1,21 @@
+/* Estilo para el botón de cerrar sesión */
+.cerrar-sesion-button {
+    background-color: #f44336; /* Color rojo */
+    color: white; /* Color del texto */
+    border: none; /* Sin bordes */
+    padding: 10px 20px; /* Espacio interno */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */
+    transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+  }
+  
+  /* Estilo para el botón al pasar el mouse sobre él */
+  .cerrar-sesion-button:hover {
+    background-color: #d32f2f; /* Color rojo más oscuro */
+  }
+
+  /* Animación al hacer clic en el botón */
+.cerrar-sesion-button:active {
+    transform: scale(1.05); /* Aumentar el tamaño en un 5% */
+  }
+  
