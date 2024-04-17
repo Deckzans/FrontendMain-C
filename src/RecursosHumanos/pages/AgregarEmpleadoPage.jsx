@@ -1,8 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 import useAppState from "../../auth/hooks/estado"
-import { registarEmpleado } from "../hooks/useRegistarEmpleado"
-import { commonValidationRules,commonValidationRulesCantidades } from "../helpers/rules"
+import { commonValidationRules, commonValidationRulesCantidades } from "../helpers/rules"
 import { escolaridad, departamentos, estadoCivil, options } from '../helpers'
 import { Alert, Box, Button, Container, Grid, Snackbar, Typography } from "@mui/material"
 import { useForm } from "react-hook-form"
@@ -11,6 +10,7 @@ import { SelectField } from "../components/formularios/SelectField"
 import { DateField } from "../components/formularios/DateField"
 import { FileField } from "../components/formularios/FileField"
 import Selectidfield from "../components/formularios/Selectidfield"
+import { agregarEmpleado, subirImagen } from "../hooks";
 
 export const AgregarEmpleadoPage = () => {
 
@@ -19,6 +19,7 @@ export const AgregarEmpleadoPage = () => {
   const [open, setOpen] = useState(false);
   const extensionesPermitidas = ["jpg", "jpeg", "png"];
   const navigate = useNavigate();
+  const [modificarArchivo, setModificarArchivo] = useState(false);
 
   const handleSnackbarClose = () => {
     setOpen(false);
@@ -26,66 +27,64 @@ export const AgregarEmpleadoPage = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log('hola')
-    const archivoSeleccionado = data.imagenEmpleado[0];
-
-
-    if (!archivoSeleccionado) {
-      console.log("sin archivos")
-      return;
-    }
-
-    const extensionArchivo = archivoSeleccionado.name.split(".").pop().toLowerCase();
-
-    // Validar la extensión del archivo
-    if (!extensionesPermitidas.includes(extensionArchivo)) {
-      console.log("no incluye archivo correcto")
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('aPaterno', data.aPaterno)
-    formData.append('aMaterno', data.aMaterno)
-    formData.append('nombre', data.nombre)
-    formData.append('regimen', data.regimen)
-    formData.append('observaciones', data.observaciones)
-    formData.append('usuarioId', id)
-    formData.append('cargo', data.cargo)
-    formData.append('status', data.status)
-    formData.append('sexo', data.sexo)
-    formData.append('sueldoBruto', parseFloat(data.sueldoBruto))
-    formData.append('sueldoNeto', parseFloat(data.sueldoNeto))
-    formData.append('fechaNacimiento', `${data.fechaNacimiento}T00:00:00.000Z`)
-    formData.append('fechaIngreso', `${data.fechaIngreso}T00:00:00.000Z`)
-    formData.append('llave', (data.llave))
-    formData.append('imagenEmpleado', data.imagenEmpleado[0].name)
-    formData.append('escolaridadId', parseInt(data.escolaridadId, 10))
-    formData.append('estadocivilid', parseInt(data.estadocivilid, 10))
-    formData.append('areaId', parseInt(data.areaId, 10))
-    formData.append('imagenEmpleado2', data.imagenEmpleado[0])
-    // console.log(formData)
-
     try {
-      await registarEmpleado(formData); 
-      if( registarEmpleado){ 
-        setOpen(true);
-      }
-      // Mostrar Snackbar de éxito
-    } catch (error) {
-      if (error.message === 'Error al ingresar empleado') {
-        // setOpenError(true); // Mostrar Snackbar de error (usuario duplicado)
-      } else {
-        console.error('Error al registrar usuario:', error);
-      }
-    }
+        const empleadoData = {
+            aPaterno: data.aPaterno,
+            aMaterno: data.aMaterno,
+            nombre: data.nombre,
+            regimen: data.regimen,
+            observaciones: data.observaciones,
+            usuarioId: id,
+            cargo: data.cargo,
+            sueldoBruto: parseFloat(data.sueldoBruto),
+            sueldoNeto: parseFloat(data.sueldoNeto),
+            llave: data.llave,
+            status: data.status,
+            sexo: data.sexo,
+            fechaNacimiento: `${data.fechaNacimiento}T00:00:00.000Z`,
+            fechaIngreso: `${data.fechaIngreso}T00:00:00.000Z`,
+            areaId: parseInt(data.areaId, 10),
+            escolaridadId: parseInt(data.escolaridadId, 10),
+            estadocivilid: parseInt(data.estadocivilid, 10),
+            imagenEmpleado: modificarArchivo ? data.imagenEmpleado[0].name : "default.png"
+        };
 
-    // console.log( data.imagenEmpleado[0])
-    // console.log(formData)
-  }
+        // Si se selecciona modificar el archivo, subirlo antes de agregar el empleado
+        if (modificarArchivo) {
+            const formData = new FormData();
+            formData.append('nuevoArchivo', data.imagenEmpleado[0]);
+            const responseImagen = await subirImagen(formData);
+
+            if (responseImagen.status === 200) {
+                const response = await agregarEmpleado(empleadoData);
+                if (response) {
+                    setOpen(true); // Mostrar Snackbar de éxito
+                } else {
+                    console.error('Error al agregar empleado:', response.message);
+                }
+            } else {
+                console.error('Error al subir la imagen:', responseImagen.message);
+                return; // Salir de la función onSubmit si hay un error al subir la imagen
+            }
+        } else {
+            // Bloque de llaves agregado para encapsular la parte del código dentro del else
+            const response = await agregarEmpleado(empleadoData);
+            if (response) {
+                setOpen(true); // Mostrar Snackbar de éxito
+            } else {
+                console.error('Error al agregar empleado:');
+            }
+        }
+    } catch (error) {
+        console.error('Error al agregar empleado:', error);
+    }
+};
+
 
   const handleReset = () => {
     reset();
   };
+
 
   return (
     <Container maxWidth="lg" sx={{ mt: 5, mb: 5 }}>
@@ -153,29 +152,37 @@ export const AgregarEmpleadoPage = () => {
             inf="¿Cual es el estado civil?"
             options={estadoCivil}
           />
-          <FileField name="imagenEmpleado" label="Subir archvio" rules={{
-            required: 'Este campo es requerido',
-            validate: {
-              customValidation: value => {
-                const archivoSeleccionado = value[0];
-
-                if (!archivoSeleccionado) {
-                  return 'Por favor, selecciona un archivo.';
-                }
-
-                const extensionArchivo = archivoSeleccionado.name.split(".").pop().toLowerCase();
-
-                // Validar la extensión del archivo
-                if (!extensionesPermitidas.includes(extensionArchivo)) {
-                  return 'Formato de archivo no válido. Solo se permiten archivos JPG, JPEG, o PNG.';
-                }
-
-                return true; // La validación es exitosa
-              },
-            },
-          }} control={control} />
-
-          {/* <input type="file" name="imagenEmpleado" onChange={(e) => setFile(e.target.files[0])} {...register('imagenEmpleado')} /> */}
+          {modificarArchivo && (
+            <FileField
+              name="imagenEmpleado"
+              label="Subir archivo"
+              rules={{
+                required: 'Este campo es requerido',
+                validate: {
+                  customValidation: value => {
+                    const archivoSeleccionado = value[0];
+                    if (!archivoSeleccionado) {
+                      return 'Por favor, selecciona un archivo.';
+                    }
+                    const extensionArchivo = archivoSeleccionado.name.split(".").pop().toLowerCase();
+                    // Validar la extensión del archivo
+                    if (extensionArchivo !== 'jpg' && extensionArchivo !== 'png') {
+                      return 'Formato de archivo no válido. Solo se permite formato JPG o PNG.';
+                    }
+                    return true; // La validación es exitosa
+                  },
+                },
+              }}
+              control={control}
+              style={!modificarArchivo ? { display: 'none' } : {}}
+            />
+          )}
+          <Grid item xs={12}>
+            <label>
+              <input type="checkbox" onChange={() => setModificarArchivo(!modificarArchivo)} />
+              Subir archivo
+            </label>
+          </Grid>
         </Grid>
         <Box mt={3}>
           <Button type="submit" variant="contained" color="primary" sx={{ mr: 2 }}>
